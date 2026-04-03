@@ -1,27 +1,23 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import HymnViewer from '../components/HymnViewer';
 import {
-  getHymnByNumber,
+  getViewModeLabel,
   HYMNAL_IDS,
   HYMNALS,
   HYMNAL_OPTIONS,
   normalizeHymnNumber,
+  VIEW_MODES,
+  VIEW_MODE_OPTIONS,
 } from '../data/hymnals';
 
-const FULL_DISPLAY_LABELS = {
-  [HYMNAL_IDS.VOZ_MELODIA]: 'Voz de Melodia',
-  [HYMNAL_IDS.HINARIO_CULTO_CRISTAO]: 'Hinário para o Culto Cristão',
-  [HYMNAL_IDS.CANTICOS]: 'Cânticos avulsos',
-};
-
 export default function HomePage() {
+  const [selectedViewMode, setSelectedViewMode] = useState(VIEW_MODES.LETRA);
   const [selectedHymnalId, setSelectedHymnalId] = useState(HYMNAL_IDS.VOZ_MELODIA);
   const [numberInput, setNumberInput] = useState('');
-  const [selectedHymn, setSelectedHymn] = useState(null);
+  const [selectedRequest, setSelectedRequest] = useState(null);
   const [error, setError] = useState('');
 
   const selectedHymnal = HYMNALS[selectedHymnalId];
-  const hymnCount = useMemo(() => Object.keys(selectedHymnal.map).length, [selectedHymnal]);
 
   useEffect(() => {
     document.title = 'IBC Cânticos';
@@ -36,41 +32,35 @@ export default function HomePage() {
     }
 
     const numeroNormalizado = normalizeHymnNumber(numberInput);
-    const hymn = getHymnByNumber(selectedHymnalId, numeroNormalizado);
-    const tipoSelecionado = selectedHymnal.fullLabel;
+    const tipoSelecionado = `${getViewModeLabel(selectedViewMode)} / ${selectedHymnal.fullLabel}`;
     const numeroDigitado = numberInput;
-    const pdfUrl = selectedHymnal.pdfUrl;
-    const tituloEncontrado = hymn?.title ?? null;
-    const paginaMapa = hymn?.startPage ?? null;
+    const pdfUrl = selectedHymnal.pdfVariants[selectedViewMode];
 
     console.log('tipoSelecionado:', tipoSelecionado);
     console.log('numeroDigitado:', numeroDigitado);
     console.log('numeroNormalizado:', numeroNormalizado);
     console.log('pdfUrl:', pdfUrl);
-    console.log('tituloEncontrado:', tituloEncontrado);
-    console.log('paginaMapa:', paginaMapa);
 
-    if (!hymn) {
-      setError(`Hino ${numberInput} não encontrado em ${selectedHymnal.label}.`);
-      setSelectedHymn(null);
+    if (!numeroNormalizado) {
+      setError('Digite um número de hino válido.');
       return;
     }
 
     setError('');
-    setSelectedHymn({
+    setSelectedRequest({
       hymnal: selectedHymnal,
-      hymn,
-      numeroNormalizado,
+      viewMode: selectedViewMode,
+      hymnNumber: numeroNormalizado,
     });
   }
 
-  if (selectedHymn) {
+  if (selectedRequest) {
     return (
       <HymnViewer
-        hymnal={selectedHymn.hymnal}
-        hymn={selectedHymn.hymn}
-        numeroNormalizado={selectedHymn.numeroNormalizado}
-        onClose={() => setSelectedHymn(null)}
+        hymnal={selectedRequest.hymnal}
+        viewMode={selectedRequest.viewMode}
+        hymnNumber={selectedRequest.hymnNumber}
+        onClose={() => setSelectedRequest(null)}
       />
     );
   }
@@ -89,11 +79,8 @@ export default function HomePage() {
 
           <div className="home-intro">
             <p className="home-lead">
-              Escolha o Hinário e digite o número para abrir o cântico.
+              Escolha o modo, a coleção e o número do hino para abrir somente o trecho certo do PDF.
             </p>
-            <div className="home-meta">
-              <span className="meta-pill">{FULL_DISPLAY_LABELS[selectedHymnalId]} | {hymnCount} Entradas</span>
-            </div>
           </div>
         </div>
 
@@ -102,11 +89,39 @@ export default function HomePage() {
             <div className="section-heading">
               <span className="section-step">1</span>
               <div>
-                <h2>Escolha o Hinário</h2>
+                <h2>Modo de visualização</h2>
+                <p>Letra usa o PDF base. Cifra e Partitura seguem a convenção automática de nome.</p>
               </div>
             </div>
 
-            <fieldset className="hymnal-switcher" aria-label="Escolher hinário">
+            <fieldset className="mode-switcher" aria-label="Escolher modo de visualização">
+              {VIEW_MODE_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  className={option.id === selectedViewMode ? 'mode-option active' : 'mode-option'}
+                  onClick={() => {
+                    setSelectedViewMode(option.id);
+                    setError('');
+                  }}
+                >
+                  <span className="mode-option-label">{option.label}</span>
+                  <span className="mode-option-subtitle">{option.description}</span>
+                </button>
+              ))}
+            </fieldset>
+          </div>
+
+          <div className="form-section">
+            <div className="section-heading">
+              <span className="section-step">2</span>
+              <div>
+                <h2>Escolha a coleção</h2>
+                <p>O app aplica o modo selecionado sobre a coleção escolhida.</p>
+              </div>
+            </div>
+
+            <fieldset className="hymnal-switcher" aria-label="Escolher coleção">
               {HYMNAL_OPTIONS.map((option) => (
                 <button
                   key={option.id}
@@ -125,9 +140,10 @@ export default function HomePage() {
 
           <div className="form-section">
             <div className="section-heading">
-              <span className="section-step">2</span>
+              <span className="section-step">3</span>
               <div>
-                <h2>Digite o Número</h2>
+                <h2>Digite o número</h2>
+                <p>O app localiza o início real do hino e recorta apenas o bloco correspondente.</p>
               </div>
             </div>
 
@@ -138,20 +154,19 @@ export default function HomePage() {
               inputMode="numeric"
               autoComplete="off"
               autoFocus
-              placeholder="01"
+              placeholder="320"
               value={numberInput}
               onChange={(event) => {
                 setNumberInput(event.target.value.replace(/\D/g, ''));
                 setError('');
               }}
             />
-
           </div>
 
           {error ? <div className="form-error" role="alert">{error}</div> : null}
 
           <button type="submit" className="open-button">
-            Abrir em Tela Cheia
+            Abrir hino
           </button>
         </form>
       </section>

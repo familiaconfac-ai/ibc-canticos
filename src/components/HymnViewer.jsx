@@ -1,11 +1,13 @@
+import { useEffect, useState } from 'react';
 import PdfViewer from './PdfViewer';
-import { formatHymnNumber } from '../data/hymnals';
+import { formatHymnNumber, getViewModeLabel } from '../data/hymnals';
 
-export default function HymnViewer({ hymnal, hymn, numeroNormalizado, onClose }) {
-  const pageLabel =
-    hymn.startPage === hymn.endPage
-      ? `Página ${hymn.startPage}`
-      : `Páginas ${hymn.startPage} a ${hymn.endPage}`;
+export default function HymnViewer({ hymnal, viewMode, hymnNumber, onClose }) {
+  const [resolvedHymn, setResolvedHymn] = useState(null);
+
+  useEffect(() => {
+    setResolvedHymn(null);
+  }, [hymnNumber, hymnal.id, viewMode]);
 
   return (
     <section className="hymn-viewer-shell" aria-label="Visualizador do hino">
@@ -15,21 +17,31 @@ export default function HymnViewer({ hymnal, hymn, numeroNormalizado, onClose })
         </button>
 
         <div className="viewer-heading">
-          <span className="viewer-badge">{hymnal.label}</span>
+          <div className="viewer-meta-badges">
+            <span className="viewer-badge">{hymnal.label}</span>
+            <span className="viewer-badge viewer-badge-muted">{getViewModeLabel(viewMode)}</span>
+          </div>
+
           <h1>
-            {formatHymnNumber(hymn.number)}. {hymn.title}
+            {formatHymnNumber(hymnNumber)}
+            {resolvedHymn?.title ? `. ${resolvedHymn.title}` : ''}
           </h1>
-          <p>{pageLabel}</p>
+
+          <p>
+            {resolvedHymn
+              ? `Recorte do hino ${formatHymnNumber(resolvedHymn.number)} entre as páginas ${resolvedHymn.startPage} e ${resolvedHymn.endPage}.`
+              : 'Localizando o bloco real do hino no PDF...'}
+          </p>
+
+          {resolvedHymn?.notice ? <div className="viewer-note">{resolvedHymn.notice}</div> : null}
         </div>
       </header>
 
       <PdfViewer
-        pdfUrl={hymnal.pdfUrl}
-        startPage={hymn.startPage}
-        endPage={hymn.endPage}
-        numeroNormalizado={numeroNormalizado}
-        tituloEncontrado={hymn.title}
-        paginaMapa={hymn.startPage}
+        hymnal={hymnal}
+        viewMode={viewMode}
+        hymnNumber={hymnNumber}
+        onResolve={setResolvedHymn}
       />
     </section>
   );

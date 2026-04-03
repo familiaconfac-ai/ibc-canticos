@@ -123,7 +123,7 @@ button {
 
 .home-intro {
   display: grid;
-  gap: 14px;
+  gap: 10px;
 }
 
 .home-lead {
@@ -205,6 +205,55 @@ button {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
+}
+
+.mode-switcher {
+  margin: 0;
+  padding: 6px;
+  border: none;
+  border-radius: 20px;
+  background: var(--color-primary-soft);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mode-option {
+  min-height: 64px;
+  border: none;
+  border-radius: 16px;
+  background: transparent;
+  color: var(--color-primary);
+  padding: 10px 8px;
+  display: grid;
+  gap: 4px;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+  transition: transform 0.15s, background 0.15s, color 0.15s;
+}
+
+.mode-option:hover {
+  background: rgba(14, 61, 122, 0.08);
+  transform: translateY(-1px);
+}
+
+.mode-option.active {
+  background: linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-strong) 100%);
+  color: #ffffff;
+  box-shadow: var(--shadow-card);
+}
+
+.mode-option-label {
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.mode-option-subtitle {
+  font-size: 0.72rem;
+  line-height: 1.2;
+  opacity: 0.82;
 }
 
 .hymnal-option {
@@ -356,6 +405,12 @@ button {
   gap: 6px;
 }
 
+.viewer-meta-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .viewer-heading h1 {
   margin: 0;
   font-size: clamp(1.5rem, 5vw, 2.2rem);
@@ -376,6 +431,20 @@ button {
   color: var(--color-primary-strong);
   font-size: 0.82rem;
   font-weight: 700;
+}
+
+.viewer-badge-muted {
+  background: rgba(14, 61, 122, 0.08);
+}
+
+.viewer-note {
+  width: min(100%, 720px);
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(240, 180, 41, 0.12);
+  color: var(--color-primary-strong);
+  font-size: 0.92rem;
+  font-weight: 600;
 }
 
 .pdf-viewer {
@@ -443,6 +512,10 @@ button {
   color: var(--color-danger);
 }
 
+.pdf-feedback-note {
+  color: var(--color-primary-strong);
+}
+
 @media (min-width: 640px) {
   .home-card {
     padding: 40px 34px 34px;
@@ -476,6 +549,10 @@ button {
   }
 
   .hymnal-option-subtitle {
+    display: none;
+  }
+
+  .mode-option-subtitle {
     display: none;
   }
 }
@@ -536,6 +613,10 @@ button {
     grid-template-columns: 1fr;
   }
 
+  .mode-switcher {
+    grid-template-columns: 1fr;
+  }
+
   .hymnal-option {
     min-height: 58px;
     justify-items: start;
@@ -543,7 +624,18 @@ button {
     padding-inline: 14px;
   }
 
+  .mode-option {
+    min-height: 58px;
+    justify-items: start;
+    text-align: left;
+    padding-inline: 14px;
+  }
+
   .hymnal-option-subtitle {
+    display: block;
+  }
+
+  .mode-option-subtitle {
     display: block;
   }
 }
