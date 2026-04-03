@@ -326,6 +326,9 @@ button {
   min-height: 100dvh;
   padding: 18px 14px 28px;
   background: linear-gradient(180deg, #ddeaf8 0%, #eef4fc 100%);
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .hymn-viewer-header {
@@ -376,6 +379,7 @@ button {
   margin: 0 auto;
   display: grid;
   gap: 16px;
+  touch-action: pan-y pinch-zoom;
 }
 
 .pdf-status {
@@ -410,9 +414,11 @@ button {
   display: block;
   width: 100%;
   max-width: 100%;
+  height: auto;
   margin: 0 auto;
   border-radius: 14px;
   background: #ffffff;
+  touch-action: pinch-zoom;
 }
 
 .pdf-feedback {
@@ -457,6 +463,32 @@ button {
 
   .hymnal-option-subtitle {
     display: none;
+  }
+}
+
+/* Landscape mobile */
+@media (orientation: landscape) and (max-height: 500px) {
+  .hymn-viewer-shell {
+    padding: 10px 10px 16px;
+  }
+
+  .hymn-viewer-header {
+    position: relative;
+    padding-bottom: 10px;
+  }
+
+  .viewer-back-button {
+    min-height: 38px;
+    font-size: 0.9rem;
+  }
+
+  .pdf-viewer {
+    width: min(100%, 100%);
+  }
+
+  .pdf-page-card {
+    padding: 6px;
+    border-radius: 14px;
   }
 }
 
