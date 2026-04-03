@@ -146,11 +146,22 @@ export default function PdfViewer({
     const resizeObserver = new ResizeObserver(([entry]) => {
       setContainerWidth(Math.max(280, Math.floor(entry.contentRect.width)));
     });
+    const visualViewport = window.visualViewport;
 
     resizeObserver.observe(containerRef.current);
     updateContainerWidth();
+    window.addEventListener('resize', updateContainerWidth, { passive: true });
+    window.addEventListener('orientationchange', updateContainerWidth, { passive: true });
+    visualViewport?.addEventListener('resize', updateContainerWidth, { passive: true });
+    visualViewport?.addEventListener('scroll', updateContainerWidth, { passive: true });
 
-    return () => resizeObserver.disconnect();
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateContainerWidth);
+      window.removeEventListener('orientationchange', updateContainerWidth);
+      visualViewport?.removeEventListener('resize', updateContainerWidth);
+      visualViewport?.removeEventListener('scroll', updateContainerWidth);
+    };
   }, [pdf]);
 
   if (error) {

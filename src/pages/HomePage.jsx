@@ -24,7 +24,7 @@ export default function HomePage() {
   const hymnCount = useMemo(() => Object.keys(selectedHymnal.map).length, [selectedHymnal]);
 
   useEffect(() => {
-    document.title = 'Cânticos';
+    document.title = 'IBC Cânticos';
   }, []);
 
   function handleOpen(event) {

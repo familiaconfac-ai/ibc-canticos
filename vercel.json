@@ -37,7 +37,7 @@
       ]
     },
     {
-      "source": "/apple-touch-icon.png",
+      "source": "/icon-192.png",
       "headers": [
         {
           "key": "Cache-Control",

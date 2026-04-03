@@ -25,10 +25,12 @@
 html {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
+  min-height: 100%;
 }
 
 body {
   margin: 0;
+  min-height: 100svh;
   min-height: 100dvh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background:
@@ -50,6 +52,8 @@ button {
 }
 
 #root {
+  min-height: 100%;
+  min-height: 100svh;
   min-height: 100dvh;
 }
 
@@ -323,12 +327,12 @@ button {
 }
 
 .hymn-viewer-shell {
+  min-height: 100svh;
   min-height: 100dvh;
   padding: 18px 14px 28px;
   background: linear-gradient(180deg, #ddeaf8 0%, #eef4fc 100%);
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow: visible;
+  touch-action: auto;
 }
 
 .hymn-viewer-header {
@@ -379,7 +383,8 @@ button {
   margin: 0 auto;
   display: grid;
   gap: 16px;
-  touch-action: pan-y pinch-zoom;
+  overflow: visible;
+  touch-action: auto;
 }
 
 .pdf-status {
@@ -392,6 +397,7 @@ button {
 .pdf-pages {
   display: grid;
   gap: 18px;
+  overflow: visible;
 }
 
 .pdf-page-card {
@@ -401,6 +407,7 @@ button {
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.82);
   box-shadow: var(--shadow-card);
+  overflow: visible;
 }
 
 .pdf-page-label {
@@ -418,7 +425,7 @@ button {
   margin: 0 auto;
   border-radius: 14px;
   background: #ffffff;
-  touch-action: pinch-zoom;
+  touch-action: auto;
 }
 
 .pdf-feedback {
@@ -443,6 +450,13 @@ button {
 
   .hymn-viewer-shell {
     padding: 24px 22px 40px;
+  }
+}
+
+@media (pointer: coarse) {
+  .hymn-viewer-header {
+    position: relative;
+    top: auto;
   }
 }
 
