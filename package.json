@@ -1,0 +1,31 @@
+{
+  "name": "superintendencia-ebd",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aplicativo mobile para acesso rápido aos hinários no culto",
+  "type": "module",
+  "scripts": {
+    "generate:hymns": "node scripts/generate-hymn-maps.mjs",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext .js,.jsx"
+  },
+  "dependencies": {
+    "pdfjs-dist": "^5.5.207",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.23.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.3",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "vite": "^5.3.1"
+  },
+  "main": "vite.config.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
