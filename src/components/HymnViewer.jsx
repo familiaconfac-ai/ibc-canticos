@@ -29,7 +29,9 @@ export default function HymnViewer({ hymnal, viewMode, hymnNumber, onClose }) {
 
           <p>
             {resolvedHymn
-              ? `Recorte do hino ${formatHymnNumber(resolvedHymn.number)} entre as páginas ${resolvedHymn.startPage} e ${resolvedHymn.endPage}.`
+              ? resolvedHymn.startPage === resolvedHymn.endPage
+                ? `Página ${resolvedHymn.startPage}.`
+                : `Páginas ${resolvedHymn.startPage} e ${resolvedHymn.endPage}.`
               : 'Localizando o bloco real do hino no PDF...'}
           </p>
 

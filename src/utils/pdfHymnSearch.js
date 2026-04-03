@@ -2,7 +2,7 @@ const headingIndexCache = new Map();
 
 const START_PADDING = 12;
 const NEXT_HEADING_PADDING = 14;
-const MIN_VISIBLE_HEIGHT = 12;
+const MIN_VISIBLE_HEIGHT = 1;
 
 function normalizeText(value) {
   return String(value ?? '').replace(/\s+/g, ' ').trim();
@@ -278,7 +278,18 @@ export function findHymnBlock(index, hymnNumber) {
 
   const targetHeading = index.headings[targetIndex];
   const nextHeading = getNextDistinctHeading(index.headings, targetIndex);
+
   const lastPage = nextHeading ? nextHeading.pageNumber : index.numPages;
+
+  // When the next hymn heading is detected on the SAME page as this hymn,
+  // the hymn ends within that page. We do NOT extend to the following page.
+  // We also skip the clipBottom in this case: the padding heuristic alone was
+  // cutting the last line of the current hymn. Showing the rest of the page
+  // (which may include a small sliver of the next hymn's heading) is preferable
+  // to cutting content prematurely.
+  const samePageCollision =
+    nextHeading != null && nextHeading.pageNumber === targetHeading.pageNumber;
+
   const segments = [];
 
   for (let pageNumber = targetHeading.pageNumber; pageNumber <= lastPage; pageNumber += 1) {
@@ -290,7 +301,9 @@ export function findHymnBlock(index, hymnNumber) {
       clipTop = Math.max(0, targetHeading.top - START_PADDING);
     }
 
-    if (nextHeading && pageNumber === nextHeading.pageNumber) {
+    // Apply bottom clip only when the next heading is on a different page.
+    // In same-page collisions the clip is intentionally omitted (see above).
+    if (!samePageCollision && nextHeading && pageNumber === nextHeading.pageNumber) {
       const endTop = Math.max(0, nextHeading.top - NEXT_HEADING_PADDING);
       clipBottom = Math.max(0, pageHeight - endTop);
     }
@@ -304,6 +317,12 @@ export function findHymnBlock(index, hymnNumber) {
         clipBottom,
       });
     }
+  }
+
+  if (import.meta.env.DEV) {
+    console.log(
+      `[findHymnBlock] #${normalizedNumber}: target p${targetHeading.pageNumber} | next ${nextHeading?.number ?? '—'} p${nextHeading?.pageNumber ?? '—'} | samePageCollision=${samePageCollision} | lastPage=${lastPage} | segments=[${segments.map((s) => `p${s.pageNumber}(top=${s.clipTop.toFixed(0)},bot=${s.clipBottom.toFixed(0)})`).join(', ')}]`,
+    );
   }
 
   if (!segments.length) {

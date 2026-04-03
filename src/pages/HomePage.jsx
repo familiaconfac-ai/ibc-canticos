@@ -77,96 +77,60 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="home-intro">
-            <p className="home-lead">
-              Escolha o modo, a coleção e o número do hino para abrir somente o trecho certo do PDF.
-            </p>
-          </div>
         </div>
 
         <form className="hymnal-form" onSubmit={handleOpen}>
-          <div className="form-section">
-            <div className="section-heading">
-              <span className="section-step">1</span>
-              <div>
-                <h2>Modo de visualização</h2>
-                <p>Letra usa o PDF base. Cifra e Partitura seguem a convenção automática de nome.</p>
-              </div>
-            </div>
+          <fieldset className="mode-switcher" aria-label="Escolher modo de visualização">
+            {VIEW_MODE_OPTIONS.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                className={option.id === selectedViewMode ? 'mode-option active' : 'mode-option'}
+                onClick={() => {
+                  setSelectedViewMode(option.id);
+                  setError('');
+                }}
+              >
+                <span className="mode-option-label">{option.label}</span>
+              </button>
+            ))}
+          </fieldset>
 
-            <fieldset className="mode-switcher" aria-label="Escolher modo de visualização">
-              {VIEW_MODE_OPTIONS.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  className={option.id === selectedViewMode ? 'mode-option active' : 'mode-option'}
-                  onClick={() => {
-                    setSelectedViewMode(option.id);
-                    setError('');
-                  }}
-                >
-                  <span className="mode-option-label">{option.label}</span>
-                  <span className="mode-option-subtitle">{option.description}</span>
-                </button>
-              ))}
-            </fieldset>
-          </div>
+          <fieldset className="hymnal-switcher" aria-label="Escolher coleção">
+            {HYMNAL_OPTIONS.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                className={option.id === selectedHymnalId ? 'hymnal-option active' : 'hymnal-option'}
+                onClick={() => {
+                  setSelectedHymnalId(option.id);
+                  setError('');
+                }}
+              >
+                <span className="hymnal-option-label">{option.label}</span>
+              </button>
+            ))}
+          </fieldset>
 
-          <div className="form-section">
-            <div className="section-heading">
-              <span className="section-step">2</span>
-              <div>
-                <h2>Escolha a coleção</h2>
-                <p>O app aplica o modo selecionado sobre a coleção escolhida.</p>
-              </div>
-            </div>
-
-            <fieldset className="hymnal-switcher" aria-label="Escolher coleção">
-              {HYMNAL_OPTIONS.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  className={option.id === selectedHymnalId ? 'hymnal-option active' : 'hymnal-option'}
-                  onClick={() => {
-                    setSelectedHymnalId(option.id);
-                    setError('');
-                  }}
-                >
-                  <span className="hymnal-option-label">{option.label}</span>
-                </button>
-              ))}
-            </fieldset>
-          </div>
-
-          <div className="form-section">
-            <div className="section-heading">
-              <span className="section-step">3</span>
-              <div>
-                <h2>Digite o número</h2>
-                <p>O app localiza o início real do hino e recorta apenas o bloco correspondente.</p>
-              </div>
-            </div>
-
-            <input
+          <input
               id="hymn-number"
               className="hymn-input"
               type="text"
               inputMode="numeric"
               autoComplete="off"
               autoFocus
-              placeholder="320"
+              placeholder="Digite o número"
               value={numberInput}
               onChange={(event) => {
                 setNumberInput(event.target.value.replace(/\D/g, ''));
                 setError('');
               }}
             />
-          </div>
 
           {error ? <div className="form-error" role="alert">{error}</div> : null}
 
           <button type="submit" className="open-button">
-            Abrir hino
+            ABRIR
           </button>
         </form>
       </section>

@@ -77,14 +77,17 @@ button {
 
 .home-header {
   display: grid;
-  gap: 22px;
-  margin-bottom: 28px;
+  gap: 16px;
+  margin-bottom: 24px;
+  text-align: center;
 }
 
 .home-brand {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  text-align: center;
 }
 
 .home-logo {
@@ -100,16 +103,13 @@ button {
 }
 
 .home-kicker {
-  display: inline-flex;
-  width: fit-content;
-  padding: 5px 10px;
-  border-radius: 999px;
-  background: rgba(14, 61, 122, 0.08);
+  display: block;
   color: var(--color-primary);
-  font-size: 0.78rem;
+  font-size: clamp(1rem, 3.5vw, 1.4rem);
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+  line-height: 1.15;
 }
 
 .home-title {
@@ -158,10 +158,6 @@ button {
 .form-section {
   display: grid;
   gap: 14px;
-  padding: 18px;
-  border: 1px solid rgba(14, 61, 122, 0.1);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.7);
 }
 
 .section-heading {
@@ -219,7 +215,7 @@ button {
 }
 
 .mode-option {
-  min-height: 64px;
+  min-height: 52px;
   border: none;
   border-radius: 16px;
   background: transparent;
@@ -248,16 +244,12 @@ button {
   font-size: 0.92rem;
   font-weight: 800;
   line-height: 1.1;
-}
-
-.mode-option-subtitle {
-  font-size: 0.72rem;
-  line-height: 1.2;
-  opacity: 0.82;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .hymnal-option {
-  min-height: 60px;
+  min-height: 52px;
   border: none;
   border-radius: 16px;
   background: transparent;
@@ -287,12 +279,17 @@ button {
   font-size: 0.92rem;
   font-weight: 800;
   line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.hymnal-option-subtitle {
-  font-size: 0.72rem;
-  line-height: 1.2;
-  opacity: 0.82;
+.number-label {
+  margin: 0;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
 }
 
 .field-label {
@@ -321,6 +318,13 @@ button {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 4px rgba(14, 61, 122, 0.14);
   transform: translateY(-1px);
+}
+
+.hymn-input::placeholder {
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--color-muted);
 }
 
 .input-hint {
