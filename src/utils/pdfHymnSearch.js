@@ -337,3 +337,41 @@ export function findHymnBlock(index, hymnNumber) {
     segments,
   };
 }
+
+/**
+ * Resolves a hymn block directly from a pre-built JSON map (strategy: 'map').
+ * Each map entry must have { startPage, endPage, title }.
+ * No PDF text scanning is performed.
+ */
+export function findHymnBlockFromMap(hymnMap, hymnNumber) {
+  const digits = String(hymnNumber ?? '').replace(/\D/g, '');
+  const normalizedNumber = digits ? String(Number(digits)) : '';
+
+  if (!normalizedNumber) {
+    return null;
+  }
+
+  const entry = hymnMap[normalizedNumber];
+
+  if (!entry) {
+    return null;
+  }
+
+  const segments = [];
+
+  for (let page = entry.startPage; page <= entry.endPage; page += 1) {
+    segments.push({ pageNumber: page, clipTop: 0, clipBottom: 0 });
+  }
+
+  if (!segments.length) {
+    return null;
+  }
+
+  return {
+    number: normalizedNumber,
+    title: entry.title ?? '',
+    startPage: entry.startPage,
+    endPage: entry.endPage,
+    segments,
+  };
+}

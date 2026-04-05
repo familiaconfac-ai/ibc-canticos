@@ -58,7 +58,7 @@ export const HYMNALS = {
     fullLabel: 'Hinário para o Culto Cristão',
     basePdfName: 'hinario-culto-cristao',
     map: hinarioCultoCristaoMap,
-    searchStrategy: 'structured',
+    searchStrategy: 'map',
   }),
   [HYMNAL_IDS.CANTICOS]: createHymnal({
     id: HYMNAL_IDS.CANTICOS,

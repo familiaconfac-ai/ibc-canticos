@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import * as pdfjs from 'pdfjs-dist';
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { getViewModeLabel, VIEW_MODES } from '../data/hymnals';
-import { findHymnBlock, getOrBuildHeadingIndex } from '../utils/pdfHymnSearch';
+import { findHymnBlock, findHymnBlockFromMap, getOrBuildHeadingIndex } from '../utils/pdfHymnSearch';
 
 pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
 
@@ -135,9 +135,22 @@ export default function PdfViewer({ hymnal, viewMode, hymnNumber, onResolve }) {
       let resolvedDocument = null;
       let fallbackNotice = '';
 
+      console.log('[DEBUG] hinário solicitado:', hymnal.id, '|', hymnal.fullLabel);
+      console.log('[DEBUG] viewMode:', viewMode, '| hymnNumber:', hymnNumber);
+      console.log('[DEBUG] URL do PDF solicitada:', requestedUrl);
+
+      try {
+        const probe = await fetch(requestedUrl, { method: 'HEAD' });
+        console.log('[DEBUG] fetch HEAD do PDF:', probe.status, probe.statusText, requestedUrl);
+      } catch (fetchErr) {
+        console.warn('[DEBUG] fetch HEAD falhou (rede?):', fetchErr.message, requestedUrl);
+      }
+
       try {
         resolvedDocument = await loadPdfDocument(requestedUrl);
+        console.log('[DEBUG] pdf.js abriu o documento com sucesso:', resolvedDocument.numPages, 'páginas');
       } catch (loadError) {
+        console.error('[DEBUG] pdf.js falhou ao abrir:', requestedUrl, '| erro:', loadError?.message ?? loadError);
         if (viewMode === VIEW_MODES.LETRA) {
           throw loadError;
         }
@@ -149,12 +162,52 @@ export default function PdfViewer({ hymnal, viewMode, hymnNumber, onResolve }) {
 
       loadedDocument = resolvedDocument;
 
-      const headingIndex = await getOrBuildHeadingIndex(
-        resolvedUrl,
-        resolvedDocument,
-        hymnal.searchStrategy,
-      );
-      const resolvedHymn = findHymnBlock(headingIndex, hymnNumber);
+      let resolvedHymn;
+
+      if (hymnal.searchStrategy === 'map') {
+        resolvedHymn = findHymnBlockFromMap(hymnal.map, hymnNumber);
+
+        console.log('[DEBUG] estratégia: map | hino solicitado:', hymnNumber);
+        if (resolvedHymn) {
+          console.log(
+            '[DEBUG] página resolvida pelo mapa:',
+            resolvedHymn.startPage,
+            resolvedHymn.startPage !== resolvedHymn.endPage ? `– ${resolvedHymn.endPage}` : '',
+            '| título:', resolvedHymn.title,
+          );
+        } else {
+          console.warn('[DEBUG] hino não encontrado no mapa. Número buscado:', hymnNumber);
+        }
+      } else {
+        const headingIndex = await getOrBuildHeadingIndex(
+          resolvedUrl,
+          resolvedDocument,
+          hymnal.searchStrategy,
+        );
+
+        console.log(
+          '[DEBUG] headingIndex construído — estratégia:', hymnal.searchStrategy,
+          '| total headings encontrados:', headingIndex.headings.length,
+        );
+        if (headingIndex.headings.length > 0) {
+          console.log(
+            '[DEBUG] primeiros headings encontrados:',
+            headingIndex.headings.slice(0, 10).map((h) => `${h.number}: ${h.title} (p.${h.pageNumber})`),
+          );
+        } else {
+          console.warn('[DEBUG] NENHUM heading encontrado no PDF com estratégia:', hymnal.searchStrategy);
+        }
+
+        resolvedHymn = findHymnBlock(headingIndex, hymnNumber);
+
+        if (!resolvedHymn) {
+          const available = headingIndex.headings.map((h) => h.number).join(', ');
+          console.warn(
+            '[DEBUG] hino não encontrado. Número buscado:', hymnNumber,
+            '| Números disponíveis no índice:', available || '(nenhum)',
+          );
+        }
+      }
 
       if (!resolvedHymn) {
         throw new Error(`Hino ${hymnNumber} não encontrado em ${hymnal.fullLabel}.`);
