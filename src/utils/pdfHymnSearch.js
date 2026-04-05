@@ -1,4 +1,5 @@
 const headingIndexCache = new Map();
+const pageOffsetCache = new Map();
 
 const START_PADDING = 12;
 const NEXT_HEADING_PADDING = 14;
@@ -373,5 +374,68 @@ export function findHymnBlockFromMap(hymnMap, hymnNumber) {
     startPage: entry.startPage,
     endPage: entry.endPage,
     segments,
+  };
+}
+
+/**
+ * Scans the first pages of a document (up to 40) using the 'line' heading
+ * strategy to find on which page hymn number 1 begins.
+ * Returns offset = (pageOfHymn1 - 1), or 0 if hymn 1 is not detected.
+ */
+async function detectPageOffset(document) {
+  const limit = Math.min(40, document.numPages);
+
+  for (let pageNumber = 1; pageNumber <= limit; pageNumber += 1) {
+    const page = await document.getPage(pageNumber);
+    const viewport = page.getViewport({ scale: 1 });
+    const textContent = await page.getTextContent();
+    const entries = getLineHeadingEntries(
+      buildLineEntries(textContent.items, viewport.height),
+      pageNumber,
+      viewport.height,
+    );
+
+    if (entries.some((entry) => entry.number === '1')) {
+      return pageNumber - 1;
+    }
+  }
+
+  return 0;
+}
+
+/**
+ * Resolves a hymn block using a direct page calculation (strategy: 'page').
+ * The page offset (number of intro pages before hymn 1) is auto-detected once
+ * per document by scanning for the heading of hymn 1, then cached.
+ *
+ * page = hymnNumber + offset
+ *
+ * Assumes one hymn per page in the reorganized PDF.
+ */
+export async function findHymnBlockByPage(cacheKey, document, hymnNumber) {
+  const digits = String(hymnNumber ?? '').replace(/\D/g, '');
+  const num = digits ? Number(digits) : 0;
+
+  if (!num) {
+    return null;
+  }
+
+  if (!pageOffsetCache.has(cacheKey)) {
+    pageOffsetCache.set(cacheKey, detectPageOffset(document));
+  }
+
+  const offset = await pageOffsetCache.get(cacheKey);
+  const targetPage = num + offset;
+
+  if (targetPage < 1 || targetPage > document.numPages) {
+    return null;
+  }
+
+  return {
+    number: String(num),
+    title: '',
+    startPage: targetPage,
+    endPage: targetPage,
+    segments: [{ pageNumber: targetPage, clipTop: 0, clipBottom: 0 }],
   };
 }

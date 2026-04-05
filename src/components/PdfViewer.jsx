@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import * as pdfjs from 'pdfjs-dist';
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { getViewModeLabel, VIEW_MODES } from '../data/hymnals';
-import { findHymnBlock, findHymnBlockFromMap, getOrBuildHeadingIndex } from '../utils/pdfHymnSearch';
+import { findHymnBlock, findHymnBlockByPage, findHymnBlockFromMap, getOrBuildHeadingIndex } from '../utils/pdfHymnSearch';
 
 pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
 
@@ -177,6 +177,15 @@ export default function PdfViewer({ hymnal, viewMode, hymnNumber, onResolve }) {
           );
         } else {
           console.warn('[DEBUG] hino não encontrado no mapa. Número buscado:', hymnNumber);
+        }
+      } else if (hymnal.searchStrategy === 'page') {
+        resolvedHymn = await findHymnBlockByPage(resolvedUrl, resolvedDocument, hymnNumber);
+
+        console.log('[DEBUG] estratégia: page | hino solicitado:', hymnNumber);
+        if (resolvedHymn) {
+          console.log('[DEBUG] página final aberta:', resolvedHymn.startPage);
+        } else {
+          console.warn('[DEBUG] número fora do intervalo do PDF. Hino buscado:', hymnNumber);
         }
       } else {
         const headingIndex = await getOrBuildHeadingIndex(
