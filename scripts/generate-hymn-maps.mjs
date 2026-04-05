@@ -17,7 +17,7 @@ const SOURCES = [
   {
     input: path.join(appRoot, 'public', 'pdfs', 'hinario-culto-cristao.pdf'),
     output: path.join(appRoot, 'src', 'data', 'hinarioCultoCristaoMap.json'),
-    extractor: extractHinarioCultoCristaoMap,
+    extractor: extractLineBasedMap,
   },
   {
     input: path.join(appRoot, 'public', 'pdfs', 'canticos.pdf'),

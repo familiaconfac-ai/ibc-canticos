@@ -1,4 +1,5 @@
 import canticosMap from './canticosMap.json';
+import hinarioCultoCristaoMap from './hinarioCultoCristaoMap.json';
 import vozDeMelodiaMap from './vozDeMelodiaMap.json';
 
 export const HYMNAL_IDS = {
@@ -56,8 +57,8 @@ export const HYMNALS = {
     label: 'Hinário',
     fullLabel: 'Hinário para o Culto Cristão',
     basePdfName: 'hinario-culto-cristao',
-    map: {},
-    searchStrategy: 'page',
+    map: hinarioCultoCristaoMap,
+    searchStrategy: 'map',
   }),
   [HYMNAL_IDS.CANTICOS]: createHymnal({
     id: HYMNAL_IDS.CANTICOS,
