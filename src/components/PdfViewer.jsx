@@ -307,18 +307,9 @@ export default function PdfViewer({ hymnal, viewMode, hymnNumber, onResolve }) {
     <div className="pdf-viewer" ref={containerRef}>
       {notice ? <div className="pdf-feedback pdf-feedback-note">{notice}</div> : null}
 
-      <div className="pdf-status">
-        <span>
-          {pages.length === 1
-            ? '1 trecho do hino carregado'
-            : `${pages.length} trechos do hino carregados`}
-        </span>
-      </div>
-
       <div className="pdf-pages">
         {pages.map((segment) => (
           <article key={`${segment.pageNumber}-${segment.clipTop}-${segment.clipBottom}`} className="pdf-page-card">
-            <div className="pdf-page-label">Página {segment.pageNumber}</div>
             <PdfPageCanvas
               pdf={pdf}
               pageNumber={segment.pageNumber}

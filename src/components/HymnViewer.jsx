@@ -27,14 +27,6 @@ export default function HymnViewer({ hymnal, viewMode, hymnNumber, onClose }) {
             {resolvedHymn?.title ? `. ${resolvedHymn.title}` : ''}
           </h1>
 
-          <p>
-            {resolvedHymn
-              ? resolvedHymn.startPage === resolvedHymn.endPage
-                ? `Página ${resolvedHymn.startPage}.`
-                : `Páginas ${resolvedHymn.startPage} e ${resolvedHymn.endPage}.`
-              : 'Localizando o bloco real do hino no PDF...'}
-          </p>
-
           {resolvedHymn?.notice ? <div className="viewer-note">{resolvedHymn.notice}</div> : null}
         </div>
       </header>
