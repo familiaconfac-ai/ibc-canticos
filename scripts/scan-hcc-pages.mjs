@@ -15,7 +15,7 @@ import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const appRoot = path.resolve(__dirname, '..');
 
-const INPUT = path.join(appRoot, 'public', 'pdfs', 'hinario-culto-cristao.pdf');
+const INPUT = path.join(appRoot, 'public', 'pdfs', 'hinario-letras.pdf');
 const standardFontDataUrl = new URL('../node_modules/pdfjs-dist/standard_fonts/', import.meta.url).href;
 
 // ---- Get first large image XObject from a page via page.objs callback ---

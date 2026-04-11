@@ -1,11 +1,13 @@
 import canticosMap from './canticosMap.json';
 import hinarioCultoCristaoMap from './hinarioCultoCristaoMap.json';
 import vozDeMelodiaMap from './vozDeMelodiaMap.json';
+import cantorCristaoMap from './cantorCristaoMap.json';
 
 export const HYMNAL_IDS = {
-  VOZ_MELODIA: 'vozMelodia',
-  HINARIO_CULTO_CRISTAO: 'hinarioCultoCristao',
   CANTICOS: 'canticos',
+  HINARIO: 'hinario',
+  VOZ_MELODIA: 'vozMelodia',
+  CANTOR_CRISTAO: 'cantorCristao',
 };
 
 export const VIEW_MODES = {
@@ -20,10 +22,10 @@ function buildPdfVariantUrl(basePdfName, viewMode) {
   }
 
   if (viewMode === VIEW_MODES.PARTITURA) {
-    return `/pdfs/${basePdfName}-partituras.pdf`;
+    return `/pdfs/${basePdfName}-partitura.pdf`;
   }
 
-  return `/pdfs/${basePdfName}.pdf`;
+  return `/pdfs/${basePdfName}-letras.pdf`;
 }
 
 function createHymnal({ id, label, fullLabel, basePdfName, map, searchStrategy }) {
@@ -44,53 +46,62 @@ function createHymnal({ id, label, fullLabel, basePdfName, map, searchStrategy }
 }
 
 export const HYMNALS = {
-  [HYMNAL_IDS.VOZ_MELODIA]: createHymnal({
-    id: HYMNAL_IDS.VOZ_MELODIA,
-    label: 'Voz de Melodia',
-    fullLabel: 'Voz de Melodia',
-    basePdfName: 'voz-melodia',
-    map: vozDeMelodiaMap,
-    searchStrategy: 'line',
-  }),
-  [HYMNAL_IDS.HINARIO_CULTO_CRISTAO]: createHymnal({
-    id: HYMNAL_IDS.HINARIO_CULTO_CRISTAO,
-    label: 'Hinário',
-    fullLabel: 'Hinário para o Culto Cristão',
-    basePdfName: 'hinario-culto-cristao',
-    map: hinarioCultoCristaoMap,
-    searchStrategy: 'map',
-  }),
   [HYMNAL_IDS.CANTICOS]: createHymnal({
     id: HYMNAL_IDS.CANTICOS,
-    label: 'Cânticos',
+    label: 'IBC',
     fullLabel: 'Cânticos',
     basePdfName: 'canticos',
     map: canticosMap,
     searchStrategy: 'line',
   }),
+  [HYMNAL_IDS.HINARIO]: createHymnal({
+    id: HYMNAL_IDS.HINARIO,
+    label: 'HCC',
+    fullLabel: 'Hinário',
+    basePdfName: 'hinario',
+    map: hinarioCultoCristaoMap,
+    searchStrategy: 'map',
+  }),
+  [HYMNAL_IDS.VOZ_MELODIA]: createHymnal({
+    id: HYMNAL_IDS.VOZ_MELODIA,
+    label: 'VM',
+    fullLabel: 'Voz da Melodia',
+    basePdfName: 'voz-melodia',
+    map: vozDeMelodiaMap,
+    searchStrategy: 'line',
+  }),
+  [HYMNAL_IDS.CANTOR_CRISTAO]: createHymnal({
+    id: HYMNAL_IDS.CANTOR_CRISTAO,
+    label: 'CC',
+    fullLabel: 'Cantor Cristão',
+    basePdfName: 'cantor-cristao',
+    map: cantorCristaoMap,
+    searchStrategy: 'line',
+  }),
 };
 
 export const HYMNAL_OPTIONS = [
-  HYMNALS[HYMNAL_IDS.VOZ_MELODIA],
-  HYMNALS[HYMNAL_IDS.HINARIO_CULTO_CRISTAO],
   HYMNALS[HYMNAL_IDS.CANTICOS],
+  HYMNALS[HYMNAL_IDS.HINARIO],
+  HYMNALS[HYMNAL_IDS.VOZ_MELODIA],
+  HYMNALS[HYMNAL_IDS.CANTOR_CRISTAO],
 ];
 
 export const VIEW_MODE_OPTIONS = [
   {
     id: VIEW_MODES.LETRA,
-    label: 'Letra',
-    description: 'PDF base da coleção',
+    label: 'Letras',
+    description: 'PDF de letras',
   },
   {
     id: VIEW_MODES.CIFRA,
-    label: 'Cifra',
-    description: 'Sufixo -cifras',
+    label: 'Cifras',
+    description: 'PDF com cifras',
   },
   {
     id: VIEW_MODES.PARTITURA,
     label: 'Partitura',
-    description: 'Sufixo -partituras',
+    description: 'PDF com partitura',
   },
 ];
 

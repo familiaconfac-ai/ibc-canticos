@@ -12,7 +12,7 @@ import {
 
 export default function HomePage() {
   const [selectedViewMode, setSelectedViewMode] = useState(VIEW_MODES.LETRA);
-  const [selectedHymnalId, setSelectedHymnalId] = useState(HYMNAL_IDS.VOZ_MELODIA);
+  const [selectedHymnalId, setSelectedHymnalId] = useState(HYMNAL_IDS.CANTICOS);
   const [numberInput, setNumberInput] = useState('');
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [error, setError] = useState('');

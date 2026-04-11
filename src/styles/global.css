@@ -199,8 +199,8 @@ button {
   border-radius: 20px;
   background: var(--color-primary-soft);
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
 }
 
 .mode-switcher {
@@ -249,13 +249,13 @@ button {
 }
 
 .hymnal-option {
-  min-height: 52px;
+  min-height: 40px;
   border: none;
-  border-radius: 16px;
+  border-radius: 14px;
   background: transparent;
   color: var(--color-primary);
   font-weight: 700;
-  padding: 10px 8px;
+  padding: 6px 4px;
   display: grid;
   gap: 4px;
   align-content: center;

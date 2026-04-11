@@ -10,7 +10,7 @@ import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const standardFontDataUrl = new URL('../node_modules/pdfjs-dist/standard_fonts/', import.meta.url).href;
 
-const pdfPath = process.argv[2] ?? path.join(__dirname, '..', 'public', 'pdfs', 'hinario-culto-cristao.pdf');
+const pdfPath = process.argv[2] ?? path.join(__dirname, '..', 'public', 'pdfs', 'hinario-letras.pdf');
 const maxPages = Number(process.argv[3] ?? 10);
 
 const data = new Uint8Array(await fs.readFile(pdfPath));

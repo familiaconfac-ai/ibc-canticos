@@ -10,17 +10,17 @@ const standardFontDataUrl = new URL('../node_modules/pdfjs-dist/standard_fonts/'
 
 const SOURCES = [
   {
-    input: path.join(appRoot, 'public', 'pdfs', 'voz-melodia.pdf'),
+    input: path.join(appRoot, 'public', 'pdfs', 'voz-melodia-letras.pdf'),
     output: path.join(appRoot, 'src', 'data', 'vozDeMelodiaMap.json'),
     extractor: extractLineBasedMap,
   },
   {
-    input: path.join(appRoot, 'public', 'pdfs', 'hinario-culto-cristao.pdf'),
+    input: path.join(appRoot, 'public', 'pdfs', 'hinario-letras.pdf'),
     output: path.join(appRoot, 'src', 'data', 'hinarioCultoCristaoMap.json'),
     extractor: extractLineBasedMap,
   },
   {
-    input: path.join(appRoot, 'public', 'pdfs', 'canticos.pdf'),
+    input: path.join(appRoot, 'public', 'pdfs', 'canticos-letras.pdf'),
     output: path.join(appRoot, 'src', 'data', 'canticosMap.json'),
     extractor: extractLineBasedMap,
   },
