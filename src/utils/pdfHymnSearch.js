@@ -1,5 +1,11 @@
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
+import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
+
 const headingIndexCache = new Map();
 const pageOffsetCache = new Map();
+const pageTextCache = new Map();
 
 const START_PADDING = 12;
 const NEXT_HEADING_PADDING = 14;
@@ -9,6 +15,13 @@ function normalizeText(value) {
   return String(value ?? '').replace(/\s+/g, ' ').trim();
 }
 
+function normalizeSearchText(value) {
+  return normalizeText(value)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+}
+
 function normalizeHeadingLine(line) {
   return normalizeText(line).replace(/[\u2013\u2014]/g, '-');
 }
@@ -16,6 +29,86 @@ function normalizeHeadingLine(line) {
 function normalizeRuntimeNumber(value) {
   const digits = String(value ?? '').replace(/\D/g, '');
   return digits ? String(Number(digits)) : '';
+}
+
+function buildExcerpt(text, query, maxLength = 160) {
+  const cleanText = normalizeText(text);
+  const normalizedText = normalizeSearchText(cleanText);
+  const normalizedQuery = normalizeSearchText(query);
+
+  if (!cleanText) {
+    return '';
+  }
+
+  if (!normalizedQuery) {
+    return cleanText.slice(0, maxLength);
+  }
+
+  const matchIndex = normalizedText.indexOf(normalizedQuery);
+
+  if (matchIndex < 0) {
+    return cleanText.length > maxLength
+      ? `${cleanText.slice(0, maxLength).trim()}...`
+      : cleanText;
+  }
+
+  const start = Math.max(0, matchIndex - 40);
+  const end = Math.min(cleanText.length, matchIndex + normalizedQuery.length + 80);
+  const excerpt = cleanText.slice(start, end).trim();
+
+  return `${start > 0 ? '...' : ''}${excerpt}${end < cleanText.length ? '...' : ''}`;
+}
+
+async function loadPdfPageTexts(pdfUrl) {
+  if (pageTextCache.has(pdfUrl)) {
+    return pageTextCache.get(pdfUrl);
+  }
+
+  const loadingTask = pdfjsLib.getDocument({ url: pdfUrl, withCredentials: false, useWorkerFetch: false });
+  const document = await loadingTask.promise;
+  const pages = [];
+
+  for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber += 1) {
+    const page = await document.getPage(pageNumber);
+    const textContent = await page.getTextContent();
+    const text = normalizeText(textContent.items.map((item) => item.str ?? '').join(' '));
+
+    pages.push({
+      pageNumber,
+      text,
+      normalizedText: normalizeSearchText(text),
+    });
+  }
+
+  document.destroy();
+  pageTextCache.set(pdfUrl, pages);
+  return pages;
+}
+
+function getMappedEntries(hymnal) {
+  const map = hymnal?.map;
+
+  if (!map || typeof map !== 'object') {
+    return [];
+  }
+
+  return Object.values(map);
+}
+
+function extractPossibleNumber(text) {
+  const match =
+    normalizeText(text).match(/\b(?:hino\s*)?0*(\d{1,3})\b/i);
+
+  return match?.[1] ? String(Number(match[1])) : '';
+}
+
+function extractPossibleTitle(text) {
+  const lines = String(text ?? '')
+    .split(/\n+/)
+    .map((line) => normalizeText(line))
+    .filter(Boolean);
+
+  return lines.find((line) => /[A-Za-zÀ-ÿ]/.test(line) && line.length >= 4) ?? '';
 }
 
 function getHeadingMatcher(line) {
@@ -438,4 +531,69 @@ export async function findHymnBlockByPage(cacheKey, document, hymnNumber) {
     endPage: targetPage,
     segments: [{ pageNumber: targetPage, clipTop: 0, clipBottom: 0 }],
   };
+}
+
+export async function searchHymnsInPdf(pdfUrl, hymnal, query) {
+  const normalizedQuery = normalizeSearchText(query);
+
+  if (!pdfUrl || !normalizedQuery) {
+    return [];
+  }
+
+  const pageTexts = await loadPdfPageTexts(pdfUrl);
+  const mappedEntries = getMappedEntries(hymnal);
+  const candidateEntries = mappedEntries.length > 0
+    ? mappedEntries
+    : pageTexts.map((page) => ({
+      number: extractPossibleNumber(page.text) || String(page.pageNumber),
+      title: extractPossibleTitle(page.text),
+      startPage: page.pageNumber,
+      endPage: page.pageNumber,
+    }));
+
+  const results = candidateEntries
+    .map((entry) => {
+      const number = normalizeRuntimeNumber(entry?.number);
+      const title = normalizeText(entry?.title ?? '');
+      const startPage = Number(entry?.startPage ?? entry?.page ?? 0);
+      const endPage = Number(entry?.endPage ?? startPage);
+
+      if (!number || !startPage || !endPage) {
+        return null;
+      }
+
+      const hymnPages = pageTexts.filter(
+        (page) => page.pageNumber >= startPage && page.pageNumber <= endPage,
+      );
+      const fullText = normalizeText(hymnPages.map((page) => page.text).join(' '));
+      const normalizedTitle = normalizeSearchText(title);
+      const normalizedNumber = normalizeSearchText(number);
+      const normalizedFullText = normalizeSearchText(fullText);
+      const matches =
+        normalizedNumber.includes(normalizedQuery) ||
+        normalizedTitle.includes(normalizedQuery) ||
+        normalizedFullText.includes(normalizedQuery);
+
+      if (!matches) {
+        return null;
+      }
+
+      return {
+        number,
+        title: title || extractPossibleTitle(fullText) || `Hino ${number}`,
+        excerpt: buildExcerpt(fullText, query),
+        page: startPage,
+        startPage,
+        endPage,
+        score:
+          (normalizedNumber === normalizedQuery ? 120 : 0) +
+          (normalizedTitle.includes(normalizedQuery) ? 80 : 0) +
+          (normalizedFullText.includes(normalizedQuery) ? 40 : 0),
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.score - a.score || Number(a.number) - Number(b.number))
+    .slice(0, 20);
+
+  return results;
 }

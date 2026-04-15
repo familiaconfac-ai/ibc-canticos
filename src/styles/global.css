@@ -155,6 +155,179 @@ button {
   gap: 18px;
 }
 
+.search-block {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.search-block-header {
+  display: grid;
+  gap: 4px;
+}
+
+.search-block-title {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--color-primary-strong);
+}
+
+.search-block-copy {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.search-input-group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.search-input-shell {
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  min-height: 54px;
+  padding: 0 48px 0 16px;
+  border: 2px solid var(--color-border);
+  border-radius: 16px;
+  background: var(--color-surface-strong);
+  color: var(--color-primary-strong);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.search-clear-button {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(14, 61, 122, 0.08);
+  color: var(--color-primary-strong);
+  font-size: 1.2rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-clear-button:hover {
+  background: rgba(14, 61, 122, 0.14);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(14, 61, 122, 0.14);
+}
+
+.voice-button,
+.search-button {
+  min-height: 54px;
+  border: none;
+  border-radius: 16px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.15s, transform 0.15s, background 0.15s;
+}
+
+.voice-button {
+  min-width: 54px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+}
+
+.voice-button.active {
+  background: linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-strong) 100%);
+  color: #ffffff;
+}
+
+.search-button {
+  background: linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-strong) 100%);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.voice-button:hover,
+.search-button:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.search-button:disabled {
+  cursor: default;
+  opacity: 0.72;
+  transform: none;
+}
+
+.search-results {
+  display: grid;
+}
+
+.search-results-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.search-result-item {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 14px 16px;
+  text-align: left;
+  display: grid;
+  gap: 8px;
+}
+
+.search-result-item:hover {
+  border-color: rgba(14, 61, 122, 0.28);
+  transform: translateY(-1px);
+}
+
+.search-result-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  color: var(--color-primary-strong);
+  font-weight: 700;
+}
+
+.search-result-hymnal,
+.search-result-number {
+  color: var(--color-primary);
+}
+
+.search-result-title {
+  color: var(--color-ink);
+}
+
+.search-result-separator {
+  color: var(--color-muted);
+}
+
+.search-result-excerpt {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.92rem;
+}
+
 .form-section {
   display: grid;
   gap: 14px;
@@ -249,13 +422,13 @@ button {
 }
 
 .hymnal-option {
-  min-height: 40px;
+  min-height: 46px;
   border: none;
   border-radius: 14px;
   background: transparent;
   color: var(--color-primary);
   font-weight: 700;
-  padding: 6px 4px;
+  padding: 8px 10px;
   display: grid;
   gap: 4px;
   align-content: center;
@@ -276,11 +449,11 @@ button {
 }
 
 .hymnal-option-label {
-  font-size: 0.92rem;
+  font-size: 0.86rem;
   font-weight: 800;
-  line-height: 1.1;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .number-label {
@@ -619,6 +792,15 @@ button {
 
   .mode-switcher {
     grid-template-columns: 1fr;
+  }
+
+  .search-input-group {
+    grid-template-columns: 1fr;
+  }
+
+  .voice-button,
+  .search-button {
+    width: 100%;
   }
 
   .hymnal-option {
